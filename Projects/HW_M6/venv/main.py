@@ -84,6 +84,8 @@ def main(folder: Path):
             print(f'Error during remove folder {folder}')
 
 
+
+
 if __name__ == "__main__":
     folder_process = Path(sys.argv[1])
     main(folder_process.resolve())
