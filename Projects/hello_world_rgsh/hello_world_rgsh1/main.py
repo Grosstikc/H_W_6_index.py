@@ -1,61 +1,52 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 
-def close_birthday_users(users, start, end):
-    now = date.today()
-    result = []
-    for user in users:
-        birthday = user.get('birthday').replace(year=now.year)
-        if start <= birthday <= end:
-            result.append(user)
-    return result
-
+users = [
+    {"name": "Bill", "birthday": date(2023, 10, 29)},
+    {"name": "Andrew", "birthday": date(2023, 11, 2)},
+    {"name": "Jill", "birthday": date(2023, 11, 4)},
+    {"name": "Till", "birthday": date(2023, 11, 5)},
+    {"name": "Jan", "birthday": date(2023, 11, 6)},
+]
 
 def get_birthdays_per_week(users):
-    if not users:
-        return {}
-    new_users = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': []}
     today = date.today()
-    year = today.year
-    current_day_of_week = today.weekday()
-    days_until_end_of_week = 6 - current_day_of_week
-    days_until_next_week = days_until_end_of_week + 1
-    first_day_of_next_week = today + timedelta(days=days_until_next_week)
-    last_day_of_next_week = first_day_of_next_week + timedelta(days=6)
-    first_day_of_next_week = first_day_of_next_week
-    last_day_of_next_week = last_day_of_next_week
+    start_of_week = today - timedelta(days=today.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+
+    birthdays_per_week = {}
+
     for user in users:
-        name = user['name']
-        birthday_date = user['birthday']
-        new_birthday_date = birthday_date.replace(year=year)
-        birthday_date_day = new_birthday_date.weekday()
-        if new_birthday_date >= first_day_of_next_week and new_birthday_date <= last_day_of_next_week:
-            if birthday_date_day == 5 or birthday_date_day == 6 or birthday_date_day == 0:
-                new_users['Monday'].append(name)
-            elif birthday_date_day == 1:
-                new_users['Tuesday'].append(name)
-            elif birthday_date_day == 2:
-                new_users['Wednesday'].append(name)
-            elif birthday_date_day == 3:
-                new_users['Thursday'].append(name)
-            else:
-                new_users['Friday'].append(name)
-        else:
-            continue
-    if any(new_users[day] for day in new_users):
-        return new_users
-    else:
-        return {}
+        name = user["name"]
+        birthday = user["birthday"].replace(year=today.year)  # Встановити рік на поточний рік
+
+        # Якщо день народження раніше, ніж сьогодні, враховуйте його на наступний рік
+        if birthday < today:
+            birthday = birthday.replace(year=today.year + 1)
+
+        # Перевірте, чи день народження припадає на поточний тиждень чи на наступний
+        if start_of_week <= birthday <= end_of_week:
+            day_of_week = birthday.strftime("%A")
+            if day_of_week not in birthdays_per_week:
+                birthdays_per_week[day_of_week] = []
+            birthdays_per_week[day_of_week].append(name)
+
+    # Перенесіть дні народження у вихідні (субота та неділя) на понеділок
+    if "Sunday" in birthdays_per_week:
+        birthdays_per_week["Monday"] = birthdays_per_week.get("Monday", []) + birthdays_per_week["Sunday"]
+        del birthdays_per_week["Sunday"]
+    if "Saturday" in birthdays_per_week:
+        birthdays_per_week["Monday"] = birthdays_per_week.get("Monday", []) + birthdays_per_week["Saturday"]
+        del birthdays_per_week["Saturday"]
+
+    return birthdays_per_week
+
+
+result = get_birthdays_per_week(users)
+print(result)
 
 
 if __name__ == "__main__":
-    users = [
-        {"name": "Bill", "birthday": datetime(year=2023, month=10, day=29).date()},
-        {"name": "Andrew", "birthday": datetime(year=2023, month=11, day=2).date()},
-        {"name": "Jill", "birthday": datetime(year=2023, month=11, day=4).date()},
-        {"name": "Till", "birthday": datetime(year=2023, month=11, day=5).date()},
-        {"name": "Jan", "birthday": datetime(year=2023, month=11, day=6).date()},
-    ]
     # Виводимо результат
     for day_name, names in result.items():
         print(f"{day_name}: {', '.join(names)}")
