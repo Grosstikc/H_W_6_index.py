@@ -9,11 +9,11 @@ users = [
     {"name": "Jan", "birthday": date(2023, 11, 6)},
 ]
 
+
 def get_birthdays_per_week(users):
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
-    end_of_week = start_of_week + timedelta(days=6)
-
+    end_of_week = today + timedelta(days=7)
     birthdays_per_week = {}
 
     for user in users:
@@ -27,20 +27,13 @@ def get_birthdays_per_week(users):
         # Перевірте, чи день народження припадає на поточний тиждень чи на наступний
         if start_of_week <= birthday <= end_of_week:
             day_of_week = birthday.strftime("%A")
+            if day_of_week in ['Sunday', 'Saturday']:
+                day_of_week = 'Monday'
             if day_of_week not in birthdays_per_week:
                 birthdays_per_week[day_of_week] = []
             birthdays_per_week[day_of_week].append(name)
 
-    # Перенесіть дні народження у вихідні (субота та неділя) на понеділок
-    if "Sunday" in birthdays_per_week:
-        birthdays_per_week["Monday"] = birthdays_per_week.get("Monday", []) + birthdays_per_week["Sunday"]
-        del birthdays_per_week["Sunday"]
-    if "Saturday" in birthdays_per_week:
-        birthdays_per_week["Monday"] = birthdays_per_week.get("Monday", []) + birthdays_per_week["Saturday"]
-        del birthdays_per_week["Saturday"]
-
     return birthdays_per_week
-
 
 result = get_birthdays_per_week(users)
 print(result)
