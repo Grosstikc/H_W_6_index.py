@@ -110,6 +110,7 @@ class AddressBook(UserDict):
         for record in self.data.values():
             if query.lower() in record.name.value.lower():
                 results.append(record)
+                continue
             for phone in record.phones:
                 if query in phone.value:
                     results.append(record)
