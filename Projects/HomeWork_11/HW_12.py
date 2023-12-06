@@ -3,6 +3,7 @@ import re
 from datetime import datetime, timedelta
 import pickle
 
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -10,26 +11,21 @@ class Field:
     def __str__(self):
         return str(self.value)
 
+
 class Name(Field):
     def __init__(self, value):
         if not value:
             raise ValueError("Name cannot be empty")
         super().__init__(value)
 
-class Phone(Field):
-    def __init__(self, value):
-        self.validate_phone(value)
-        super().__init__(value)
 
+class Phone(Field):
     def validate_phone(self, value):
         if not re.match(r'^\d{10}$', value):
             raise ValueError("Invalid phone number format. It should have 10 digits.")
 
-class Birthday(Field):
-    def __init__(self, value):
-        self.validate_birthday(value)
-        super().__init__(value)
 
+class Birthday(Field):
     def validate_birthday(self, value):
         try:
             datetime.strptime(value, '%Y-%m-%d')
@@ -39,6 +35,7 @@ class Birthday(Field):
     @property
     def datetime_value(self):
         return datetime.strptime(self.value, '%Y-%m-%d')
+
 
 class Record:
     def __init__(self, name, birthday=None):
@@ -77,6 +74,7 @@ class Record:
             days_left = (next_birthday - today).days
             return days_left
         return None
+
 
 class AddressBook(UserDict):
     def add_record(self, record):
